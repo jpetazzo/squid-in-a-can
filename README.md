@@ -20,8 +20,7 @@ will pass along to the corporate proxy.
 ## How?
 
 ```
-docker run --net host jpetazzo/squid-in-a-can
-iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to 3129
+docker run --net host --privileged jpetazzo/squid-in-a-can
 ```
 
 That's it. Now all HTTP requests going through your Docker host will be
@@ -43,13 +42,17 @@ where the machine has an internal IP address), you should probably
 tweak the ACLs, or make sure that outside machines cannot access ports
 3128 and 3129 on your host.
 
+Note: It will be available to as a proxy on port 3128 on your local machine
+if you would like to setup local proxies yourself.
+
 
 ## What?
 
 The `jpetazzo/squid-in-a-can` container runs a really basic Squid3 proxy.
 Rather than writing my own configuration file, I patch the default Debian
 configuration. The main thing is to enable `intercept` on another port
-(here, 3129).
+(here, 3129). To update the iptables for the intercept the command needs
+the --privileged flag.
 
 Then, this container should be started using *the network namespace of the
 host* (that's what the `--net host` option is for).
@@ -64,13 +67,35 @@ header to know where to send the request. You can check [CVE-2009-0801]
 for details.)
 
 
+## Tuning
+
+The docker image can be tuned using environment variables.
+
+### MAX_CACHE_OBJECT
+
+Squid has a maximum object cache size. Often when caching debian packages vs
+standard web content it is valuable to increase this size. Use the
+`-e MAX_CACHE_OBJECT=1024` to set the max object size (in MB)
+
+
+### DISK_CACHE_SIZE
+
+The squid disk cache size can be tuned. use
+`-e DISK_CACHE_SIZE=5000` to set the disk cache size (in MB)
+
+### Persistent Cache
+
+Being docker when the instance exits the cached content immediately goes away
+when the instance stops. To avoid this you can use a mounted volume. The cache
+location is `/var/cache/squid3` so if you mount that as a volume you can get
+persistent caching. Use `-v /home/user/persistent_squid_cache:/var/squid3/cache`
+in your command line to enable persistent caching.
+
 ## Notes
 
 Ideas for improvement:
 
-- persistent caching (with, obviously, a volume!)
 - easy chaining to an upstream proxy
-- setup the iptables automatically if the container runs in privileged mode
 
 
 [CVE-2009-0801]: http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0801
