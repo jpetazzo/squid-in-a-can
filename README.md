@@ -23,6 +23,15 @@ will pass along to the corporate proxy.
 docker run --net host --privileged jpetazzo/squid-in-a-can
 ```
 
+
+Checkout this repository: 
+install fig and docker
+
+```
+fig up -d squid && fig run tproxy
+```
+
+
 That's it. Now all HTTP requests going through your Docker host will be
 transparently routed through the proxy running in the container.
 

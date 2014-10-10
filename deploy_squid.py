@@ -30,37 +30,6 @@ import time
 prepare_cache_cmd = "chown -R proxy:proxy /var/cache/squid3"
 build_cmd = "squid3 -z"
 squid_cmd = "squid3 -N"
-redirect_cmd = "iptables -t nat -A PREROUTING -p tcp" \
-               " --dport 80 -j REDIRECT --to 3129 -w"
-remove_redirect_cmd = redirect_cmd.replace(' -A ', ' -D ')
-
-LOCAL_PORT = 3128
-
-
-def is_port_open(port_num):
-    """ Detect if a port is open on localhost"""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    return sock.connect_ex(('127.0.0.1', port_num)) == 0
-
-
-class RedirectContext:
-    """ A context to make sure that the iptables rules are removed
-    after they are inserted."""
-    def __enter__(self):
-        print("Enabling IPtables forwarding: '%s'" % redirect_cmd)
-        try:
-            subprocess.check_call(redirect_cmd.split())
-            self.setup = True
-        except:
-            print("Failed to setup IPTABLES. Did you use --privileged"
-                  " if not you need to run [[%s]]" % redirect_cmd)
-            self.setup = False
-        return self
-
-    def __exit__(self, type, value, traceback):
-        if self.setup:
-            print("Disabling IPtables forwarding: '%s'" % remove_redirect_cmd)
-            subprocess.check_call(remove_redirect_cmd.split())
 
 
 def main():
@@ -85,35 +54,16 @@ def main():
     subprocess.check_call(build_cmd, shell=True)
 
     # wait for the above non-blockin call to finish setting up the directories
-    time.sleep(2)
+    time.sleep(5)
 
     # Start the squid instance as a subprocess
     squid_in_a_can = subprocess.Popen(squid_cmd, shell=True)
 
     # While the process is running wait for squid to be running
-    while squid_in_a_can.poll() is None and not is_port_open(LOCAL_PORT):
-        print("Waiting for port %s to open" % LOCAL_PORT)
+    print("Waiting for squid to finish")
+    while squid_in_a_can.poll() is None:
         time.sleep(1)
 
-    if is_port_open(LOCAL_PORT):
-        print("Port %s detected open setting up IPTables redirection" %
-              LOCAL_PORT)
-        with RedirectContext():
-            # Wait for the squid instance to end or a ctrl-c
-            try:
-                while squid_in_a_can.poll() is None and \
-                        is_port_open(LOCAL_PORT):
-                    time.sleep(1)
-            except KeyboardInterrupt as ex:
-                # Catch Ctrl-C and pass it into the squid instance
-                print("CTRL-C caught, shutting down.")
-                squid_in_a_can.terminate()
-
-    else:
-        print("Port %s never opened, squid instance"
-              " must have terminated prematurely" % LOCAL_PORT)
-
-    squid_in_a_can.poll()
     print("Squid process exited with return code %s" %
           squid_in_a_can.returncode)
     return squid_in_a_can.returncode
