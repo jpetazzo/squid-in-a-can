@@ -1,0 +1,16 @@
+squid:
+  build: .
+  environment:
+    DISK_CACHE_SIZE: 5000
+    MAX_CACHE_OBJECT: 1000
+  net: "host"
+  ## Uncomment and update /path/to/cache
+  #volumes:
+  #- /path/to/cache:/var/cache/squid3
+
+tproxy:
+  build: iptables_docker/.
+  net: "host"
+  privileged: true
+  links:
+  - squid
