@@ -19,21 +19,46 @@ will pass along to the corporate proxy.
 
 ## How?
 
+You can use the squid proxy directly via docker and iptables rules, there is
+also a `fig.yml` for convenience to use fig to launch the system. For more
+information on tuning parameters see below. 
+
+### Using Docker and iptables directly.
+
+You can manually run these commands
+
+```bash
+docker run --net host -d jpetazzo/squid-in-a-can
+iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to 3129 -w
 ```
-docker run --net host --privileged jpetazzo/squid-in-a-can
+
+After you stop you will need to cleanup the iptables rules:
+```bash
+iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to 3129 -w
 ```
 
 
-Checkout this repository: 
-install fig and docker
+### Using Fig
 
-```
+There is a `fig.yml` file to enable launching via fig and a separate container
+which will setup the iptables rules for you. To use this you will need a
+local checkout of this repo and have `fig` and `docker` installed.
+
+1. Run the following commands
+```bash
 fig up -d squid && fig run tproxy
 ```
 
+### Result
 
 That's it. Now all HTTP requests going through your Docker host will be
 transparently routed through the proxy running in the container.
+
+If you your tproxy instance goes down hard without cleaning up use the following command:
+```
+iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to 3129 -w
+```
+
 
 Note: it will only affect HTTP traffic on port 80.
 
