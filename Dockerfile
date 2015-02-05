@@ -1,7 +1,5 @@
 FROM debian:jessie
-RUN apt-get -q update
-RUN apt-get -qy install squid3
-RUN apt-get -qy install python
+RUN apt-get -q update && apt-get -qy install python squid3
 RUN echo "http_port 3129 intercept" >> /etc/squid3/squid.conf
 RUN echo "maximum_object_size 1024 MB" >> /etc/squid3/squid.conf
 RUN echo "cache_dir ufs /var/cache/squid3 5000 16 256" >> /etc/squid3/squid.conf
