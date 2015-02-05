@@ -42,6 +42,7 @@ def main():
     refresh_pattern = os.getenv("REFRESH_PATTERN", None)
 
     squid_conf_entries = []
+    squid_conf_entries.append('http_port 3129 intercept\n')
     squid_conf_entries.append('maximum_object_size %s MB\n' % max_object_size)
     squid_conf_entries.append('cache_dir ufs /var/cache/squid3 %s 16 256\n' %
                               disk_cache_size)
