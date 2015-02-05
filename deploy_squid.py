@@ -39,14 +39,21 @@ def main():
 
     max_object_size = os.getenv("MAXIMUM_CACHE_OBJECT", '1024')
     disk_cache_size = os.getenv("DISK_CACHE_SIZE", '5000')
+    refresh_pattern = os.getenv("REFRESH_PATTERN", None)
 
-    print("Setting MAXIMUM_OBJECT_SIZE %s" % max_object_size)
-    print("Setting DISK_CACHE_SIZE %s" % disk_cache_size)
+    squid_conf_entries = []
+    squid_conf_entries.append('maximum_object_size %s MB\n' % max_object_size)
+    squid_conf_entries.append('cache_dir ufs /var/cache/squid3 %s 16 256\n' %
+                              disk_cache_size)
+
+    if refresh_pattern:
+        for pattern in refresh_pattern.split(';'):
+            squid_conf_entries.append('refresh_pattern %s\n' % pattern)
 
     with open("/etc/squid3/squid.conf", 'a') as conf_fh:
-        conf_fh.write('maximum_object_size %s MB\n' % max_object_size)
-        conf_fh.write('cache_dir ufs /var/cache/squid3 %s 16 256\n' %
-                      disk_cache_size)
+        for conf in squid_conf_entries:
+            print("Appending to squid.conf: [%s]" % conf)
+            conf_fh.write(conf)
 
     # Setup squid directories
     # Reassert permissions in case of mounting from outside

@@ -21,7 +21,7 @@ will pass along to the corporate proxy.
 
 You can use the squid proxy directly via docker and iptables rules, there is
 also a `fig.yml` for convenience to use fig to launch the system. For more
-information on tuning parameters see below. 
+information on tuning parameters see below.
 
 ### Using Docker and iptables directly.
 
@@ -116,6 +116,13 @@ standard web content it is valuable to increase this size. Use the
 
 The squid disk cache size can be tuned. use
 `-e DISK_CACHE_SIZE=5000` to set the disk cache size (in MB)
+
+### REFRESH_PATTERN
+
+This allows you to override the default refresh_pattern rules. It is a `\n`
+separated list each `\n` will create a new refresh_pattern entry.
+
+[Squid refresh_pattern documentation](http://www.squid-cache.org/Doc/config/refresh_pattern/)
 
 ### Persistent Cache
 
