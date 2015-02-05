@@ -117,12 +117,14 @@ standard web content it is valuable to increase this size. Use the
 The squid disk cache size can be tuned. use
 `-e DISK_CACHE_SIZE=5000` to set the disk cache size (in MB)
 
-### REFRESH_PATTERN
+### SQUID_DIRECTIVES_ONLY
 
-This allows you to override the default refresh_pattern rules. It is a `\n`
-separated list each `\n` will create a new refresh_pattern entry.
+The contents of squid.conf will only be what's defined in SQUID_DIRECTIVES
+giving the user full control of squid.
 
-[Squid refresh_pattern documentation](http://www.squid-cache.org/Doc/config/refresh_pattern/)
+### SQUID_DIRECTIVES
+This will append any contents of the environment variable to squid.conf.
+It is expected that you will use multi-line block quote for the contents.
 
 ### Persistent Cache
 

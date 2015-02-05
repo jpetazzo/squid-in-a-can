@@ -3,10 +3,9 @@ squid:
   environment:
     DISK_CACHE_SIZE: 5000
     MAX_CACHE_OBJECT: 1000
-    # default if unset
-    # REFRESH_PATTERN: '^ftp:		1440	20%	10080;^gopher:	1440	0%	1440;-i (/cgi-bin/|\?) 0	0%	0;.		0	20%	4320'
-    # agressive for dynamic systems
-    # REFRESH_PATTERN: '. 0 0 1 refresh-ims'
+    # SQUID_DIRECTIVES_ONLY: true
+    # SQUID_DIRECTIVES: |
+    #   refresh_pattern . 0 0 1 refresh-ims
   net: "host"
   ## Uncomment and update /path/to/cache
   #volumes:
