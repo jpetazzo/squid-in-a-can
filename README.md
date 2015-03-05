@@ -131,7 +131,7 @@ It is expected that you will use multi-line block quote for the contents.
 Being docker when the instance exits the cached content immediately goes away
 when the instance stops. To avoid this you can use a mounted volume. The cache
 location is `/var/cache/squid3` so if you mount that as a volume you can get
-persistent caching. Use `-v /home/user/persistent_squid_cache:/var/squid3/cache`
+persistent caching. Use `-v /home/user/persistent_squid_cache:/var/cache/squid3`
 in your command line to enable persistent caching.
 
 ## Notes
