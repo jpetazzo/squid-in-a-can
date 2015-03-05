@@ -39,14 +39,25 @@ def main():
 
     max_object_size = os.getenv("MAXIMUM_CACHE_OBJECT", '1024')
     disk_cache_size = os.getenv("DISK_CACHE_SIZE", '5000')
+    squid_directives_only = os.getenv("SQUID_DIRECTIVES_ONLY", False)
+    arbitrary_squid_directives = os.getenv("SQUID_DIRECTIVES", None)
 
-    print("Setting MAXIMUM_OBJECT_SIZE %s" % max_object_size)
-    print("Setting DISK_CACHE_SIZE %s" % disk_cache_size)
+    squid_conf_entries = []
+    squid_conf_entries.append('http_port 3129 intercept')
+    squid_conf_entries.append('maximum_object_size %s MB' % max_object_size)
+    squid_conf_entries.append('cache_dir ufs /var/cache/squid3 %s 16 256' %
+                              disk_cache_size)
 
-    with open("/etc/squid3/squid.conf", 'a') as conf_fh:
-        conf_fh.write('maximum_object_size %s MB\n' % max_object_size)
-        conf_fh.write('cache_dir ufs /var/cache/squid3 %s 16 256\n' %
-                      disk_cache_size)
+    write_mode = 'w' if squid_directives_only else 'a'
+    with open("/etc/squid3/squid.conf", write_mode) as conf_fh:
+        for conf in squid_conf_entries:
+            if not squid_directives_only:
+                print("Appending to squid.conf: [%s]" % conf)
+                conf_fh.write(conf + '\n')
+        if arbitrary_squid_directives:
+            print("Appending squid directives to squid.conf")
+            print(arbitrary_squid_directives)
+            conf_fh.write(arbitrary_squid_directives)
 
     # Setup squid directories
     # Reassert permissions in case of mounting from outside
