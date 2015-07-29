@@ -140,5 +140,13 @@ Ideas for improvement:
 
 - easy chaining to an upstream proxy
 
+### HTTPS support
+
+It has been asked if this could support HTTPS. HTTPS is designed to prevent
+man-in-the middle attacks, and a transparent proxy is effectively a MITM.
+If you want to use squid for HTTPS proxying transparently you need to setup a
+private CA certificate and push it to all your users so they trust the proxy.
+An example of how to set this up can be found [here](http://roberts.bplaced.net/index.php/linux-guides/centos-6-guides/proxy-server/squid-transparent-proxy-http-https).
+
 
 [CVE-2009-0801]: http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0801
