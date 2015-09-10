@@ -38,15 +38,16 @@ iptables -t nat -D PREROUTING -p tcp --dport 80 -j REDIRECT --to 3129 -w
 ```
 
 
-### Using Fig
+### Using Compose
 
-There is a `fig.yml` file to enable launching via fig and a separate container
+There is a `docker-compose.yml` file to enable launching via [docker compose](https://docs.docker.com/compose/) and a separate container
 which will setup the iptables rules for you. To use this you will need a
-local checkout of this repo and have `fig` and `docker` installed.
+local checkout of this repo and have `docker` and `compose` installed.
 
-1. Run the following commands
+> Run the following command in the same directory as the `docker-compose.yml` file:
+
 ```bash
-fig up -d squid && fig run tproxy
+docker-compose up
 ```
 
 ### Result
