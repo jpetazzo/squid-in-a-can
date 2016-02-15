@@ -20,7 +20,7 @@ will pass along to the corporate proxy.
 ## How?
 
 You can use the squid proxy directly via docker and iptables rules, there is
-also a `fig.yml` for convenience to use fig to launch the system. For more
+also a `docker-compose.yml` for convenience to use `docker-compose up` command to launch the system. For more
 information on tuning parameters see below.
 
 ### Using Docker and iptables directly.
