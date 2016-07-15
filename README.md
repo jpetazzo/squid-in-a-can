@@ -149,5 +149,9 @@ If you want to use squid for HTTPS proxying transparently you need to setup a
 private CA certificate and push it to all your users so they trust the proxy.
 An example of how to set this up can be found [here](http://roberts.bplaced.net/index.php/linux-guides/centos-6-guides/proxy-server/squid-transparent-proxy-http-https).
 
+Without a CA certificate configured, the default behavior is to tunnel HTTPS
+traffic using the `CONNECT` method. Squid makes the request on behalf of the
+client but cannot decrypt or cache the requests or responses.
+
 
 [CVE-2009-0801]: http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-0801
