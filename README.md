@@ -135,6 +135,18 @@ location is `/var/cache/squid3` so if you mount that as a volume you can get
 persistent caching. Use `-v /home/user/persistent_squid_cache:/var/cache/squid3`
 in your command line to enable persistent caching.
 
+If you do that, make sure that the `persistent_squid_cache` directory is
+writable by the right user. As I write these lines, the squid process
+runs as user and group `proxy`, and their UID and GID both are 13; so
+make sure that the directory is writable by UID 13, or by GID 13,
+or (if you really can't make otherwise) world-writable (but please don't).
+
+Note that if you're using Docker Mac, all volume I/O is handled by the
+Docker Mac application, which runs as an ordinary process; so you won't
+have to deal with permissions as long as you have read/write access to
+a volume.
+
+
 ## Notes
 
 Ideas for improvement:
