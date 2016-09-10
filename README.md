@@ -106,6 +106,7 @@ for details.)
 
 The docker image can be tuned using environment variables.
 
+
 ### MAX_CACHE_OBJECT
 
 Squid has a maximum object cache size. Often when caching debian packages vs
@@ -118,14 +119,29 @@ standard web content it is valuable to increase this size. Use the
 The squid disk cache size can be tuned. use
 `-e DISK_CACHE_SIZE=5000` to set the disk cache size (in MB)
 
+
 ### SQUID_DIRECTIVES_ONLY
 
 The contents of squid.conf will only be what's defined in SQUID_DIRECTIVES
 giving the user full control of squid.
 
+
 ### SQUID_DIRECTIVES
+
 This will append any contents of the environment variable to squid.conf.
 It is expected that you will use multi-line block quote for the contents.
+
+Here is an example:
+
+```bash
+docker run -d \
+    -e SQUID_DIRECTIVES="
+    # hi ho hi ho
+    # we're doing block I/O
+    # hi ho hi ho
+    " jpetazzo/squid-in-a-can
+```
+
 
 ### Persistent Cache
 
