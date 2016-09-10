@@ -26,6 +26,7 @@ import subprocess
 import socket
 import sys
 import time
+import signal
 
 redirect_cmd = "iptables -t nat -A PREROUTING -p tcp" \
                " --dport 80 -j REDIRECT --to 3129 -w"
@@ -73,10 +74,20 @@ def main():
     if is_port_open(LOCAL_PORT):
         print("Port %s detected open setting up IPTables redirection" %
               LOCAL_PORT)
+
+        # need dict to allow inner function to assign to outer scope variable
+        status = {'shutting_down': False}
+
+        def graceful_shutdown(signal, frame):
+            """Clean shutdown"""
+            print("SIGTERM caught, shutting down.")
+            status["shutting_down"] = True
+
         with RedirectContext():
             # Wait for the squid instance to end or a ctrl-c
+            signal.signal(signal.SIGTERM, graceful_shutdown)
             try:
-                while is_port_open(LOCAL_PORT):
+                while is_port_open(LOCAL_PORT) and status["shutting_down"] is False:
                     time.sleep(1)
             except KeyboardInterrupt as ex:
                 # Catch Ctrl-C and pass it into the squid instance
