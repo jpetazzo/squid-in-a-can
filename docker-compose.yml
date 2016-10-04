@@ -1,16 +1,31 @@
-squid:
-    build: squid/.
-    environment:
-        - "DISK_CACHE_SIZE=5000"
-        - "MAX_CACHE_OBJECT=1000"
-        # - "SQUID_DIRECTIVES_ONLY=true"
-        # - "SQUID_DIRECTIVES='refresh_pattern . 0 0 1 refresh-ims'"
-    net: "host"
-    ## Uncomment and update /path/to/cache
-    # volumes:
-    #   - /path/to/cache:/var/cache/squid3
-
-tproxy:
-    build: iptables_docker/.
-    net: "host"
-    privileged: true
+version: "2"
+services:
+  squid:
+      build:
+        args:
+          - http_proxy
+          - https_proxy
+          - no_proxy
+        context: squid/.
+      environment:
+          - "DISK_CACHE_SIZE=5000"
+          - "MAX_CACHE_OBJECT=1000"
+          - "PARENT_PROXY_HOST=upstream.proxy.host"
+          - "PARENT_PROXY_PORT=8080"
+          - "PARENT_PROXY_USERNAME=user"
+          # Base64 encoded password take from .env
+          - "PARENT_PROXY_PASSWORD"
+          # - "SQUID_DIRECTIVES_ONLY=true"
+          # - "SQUID_DIRECTIVES='refresh_pattern . 0 0 1 refresh-ims'"
+      network_mode: "host"
+      volumes:
+        - /var/cache/squid3:/var/cache/squid3
+  tproxy:
+      build:
+        context: iptables_docker/.
+        args:
+          - http_proxy
+          - https_proxy
+          - no_proxy
+      network_mode: "host"
+      privileged: true

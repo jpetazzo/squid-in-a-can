@@ -26,11 +26,15 @@ import subprocess
 import socket
 import sys
 import time
+import re
+import base64
 
 prepare_cache_cmd = "chown -R proxy:proxy /var/cache/squid3"
 build_cmd = "squid3 -z"
 squid_cmd = "squid3 -N"
 
+def hide_password(conf):
+    return re.sub("login=\s*([^\r]*)", "login=*****", conf)
 
 def main():
     if os.geteuid() != 0:
@@ -51,6 +55,19 @@ def main():
     squid_conf_entries.append('maximum_object_size %s MB' % max_object_size)
     squid_conf_entries.append('cache_dir ufs /var/cache/squid3 %s 16 256' %
                               disk_cache_size)
+    # Configure upstream proxy
+    pp_host = os.getenv("PARENT_PROXY_HOST", None)
+    if pp_host is not None:
+        pp_port = os.getenv("PARENT_PROXY_PORT")
+
+        pp_username = os.getenv("PARENT_PROXY_USERNAME", None)
+        if pp_username is not None:
+            # base64 decode password to avoid shoulder surfers
+            pp_password = base64.b64decode(os.getenv("PARENT_PROXY_PASSWORD"))
+            squid_conf_entries.append('cache_peer %s parent %s 0 no-query no-digest login=%s:%s' % (pp_host, pp_port, pp_username, pp_password))
+        else:
+            squid_conf_entries.append('cache_peer %s parent %s 0 no-query no-digest' % (pp_host, pp_port))
+        squid_conf_entries.append('never_direct allow all')
 
     with open("/etc/squid3/squid.conf", 'w') as conf_fh:
 
@@ -58,7 +75,7 @@ def main():
             with open("/etc/squid3/squid.conf.in", "r") as preconf:
                 conf_fh.write(preconf.read())
             for conf in squid_conf_entries:
-                print("Appending to squid.conf: [%s]" % conf)
+                print("Appending to squid.conf: [%s]" % hide_password(conf))
                 conf_fh.write(conf + '\n')
 
         if arbitrary_squid_directives:
