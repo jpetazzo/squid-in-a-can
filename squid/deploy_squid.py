@@ -28,7 +28,7 @@ import sys
 import time
 
 prepare_cache_cmd = "chown -R proxy:proxy /var/cache/squid3"
-build_cmd = "squid3 -z"
+build_cmd = "squid3 -Nz"
 squid_cmd = "squid3 -N"
 
 
@@ -70,9 +70,6 @@ def main():
     # Reassert permissions in case of mounting from outside
     subprocess.check_call(prepare_cache_cmd, shell=True)
     subprocess.check_call(build_cmd, shell=True)
-
-    # wait for the above non-blockin call to finish setting up the directories
-    time.sleep(5)
 
     # Start the squid instance as a subprocess
     squid_in_a_can = subprocess.Popen(squid_cmd, shell=True)
