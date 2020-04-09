@@ -27,9 +27,9 @@ import socket
 import sys
 import time
 
-prepare_cache_cmd = "chown -R proxy:proxy /var/cache/squid3"
-build_cmd = "squid3 -Nz"
-squid_cmd = "squid3 -N"
+prepare_cache_cmd = "chown -R proxy:proxy /var/cache/squid"
+build_cmd = "squid -Nz"
+squid_cmd = "squid -N"
 
 
 def main():
@@ -38,8 +38,8 @@ def main():
         return -1
 
     # clean up any stale pid files
-    if os.path.exists("/run/squid3.pid"):
-        os.remove("/run/squid3.pid")
+    if os.path.exists("/run/squid.pid"):
+        os.remove("/run/squid.pid")
 
     max_object_size = os.getenv("MAXIMUM_CACHE_OBJECT", '1024')
     disk_cache_size = os.getenv("DISK_CACHE_SIZE", '5000')
@@ -49,13 +49,13 @@ def main():
     squid_conf_entries = []
     squid_conf_entries.append('http_port 3129 intercept')
     squid_conf_entries.append('maximum_object_size %s MB' % max_object_size)
-    squid_conf_entries.append('cache_dir ufs /var/cache/squid3 %s 16 256' %
+    squid_conf_entries.append('cache_dir ufs /var/cache/squid %s 16 256' %
                               disk_cache_size)
 
-    with open("/etc/squid3/squid.conf", 'w') as conf_fh:
+    with open("/etc/squid/squid.conf", 'w') as conf_fh:
 
         if not squid_directives_only:
-            with open("/etc/squid3/squid.conf.in", "r") as preconf:
+            with open("/etc/squid/squid.conf.in", "r") as preconf:
                 conf_fh.write(preconf.read())
             for conf in squid_conf_entries:
                 print("Appending to squid.conf: [%s]" % conf)

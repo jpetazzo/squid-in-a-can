@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:buster
 RUN apt-get -q update && \
     DEBIAN_FRONTEND=noninteractive apt-get -qy install --no-install-recommends iptables python curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \

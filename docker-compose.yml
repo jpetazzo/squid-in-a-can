@@ -7,8 +7,8 @@ squid:
         # - "SQUID_DIRECTIVES='refresh_pattern . 0 0 1 refresh-ims'"
     net: "host"
     ## Uncomment and update /path/to/cache
-    # volumes:
-    #   - /path/to/cache:/var/cache/squid3
+    volumes:
+       - /var/cache/squid:/var/cache/squid
 
 tproxy:
     build: iptables_docker/.
