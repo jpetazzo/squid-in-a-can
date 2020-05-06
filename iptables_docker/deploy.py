@@ -32,7 +32,7 @@ redirect_cmd = "iptables -t nat -A PREROUTING -p tcp" \
                " --dport 80 -j REDIRECT --to 3129 -w"
 remove_redirect_cmd = redirect_cmd.replace(' -A ', ' -D ')
 
-LOCAL_PORT = 3128
+LOCAL_PORT = 3129
 
 
 def is_port_open(port_num):
