@@ -1,16 +1,21 @@
-squid:
+version: '3.8'
+
+services:
+  squid:
     build: squid/.
     environment:
-        - "DISK_CACHE_SIZE=5000"
-        - "MAX_CACHE_OBJECT=1000"
-        # - "SQUID_DIRECTIVES_ONLY=true"
-        # - "SQUID_DIRECTIVES='refresh_pattern . 0 0 1 refresh-ims'"
-    net: "host"
-    ## Uncomment and update /path/to/cache
-    # volumes:
-    #   - /path/to/cache:/var/cache/squid3
+      - "DISK_CACHE_SIZE=5000"
+      - "MAX_CACHE_OBJECT=1000"
+      # - "SQUID_DIRECTIVES_ONLY=true"
+      # - "SQUID_DIRECTIVES='refresh_pattern . 0 0 1 refresh-ims'"
+    network_mode: "host"
+    volumes:
+      - squid_cache:/var/cache/squid
 
-tproxy:
+  tproxy:
     build: iptables_docker/.
-    net: "host"
+    network_mode: "host"
     privileged: true
+
+volumes:
+  squid_cache:
